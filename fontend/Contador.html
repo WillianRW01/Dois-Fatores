@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Código de Acesso</title>
+  <style>
+    body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: Arial, sans-serif; }
+    .container { width: 300px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+    input, button { width: 100%; padding: 10px; margin-top: 10px; }
+    .timer { color: red; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Código de Acesso</h2>
+    <p class="timer">Tempo restante: <span id="contador">30</span> segundos</p>
+    <input type="text" id="codigo" placeholder="Digite o código">
+    <button onclick="verificarCodigo()">Verificar Código</button>
+  </div>
+
+  <script>
+    let tempoRestante = 30;
+    const contador = document.getElementById('contador');
+
+    const intervalo = setInterval(() => {
+      tempoRestante--;
+      contador.innerText = tempoRestante;
+      if (tempoRestante <= 0) {
+        clearInterval(intervalo);
+        alert('Código expirado.');
+      }
+    }, 1000);
+
+    function verificarCodigo() {
+      const codigo = document.getElementById('codigo').value;
+      alert('Verificando código...');
+    }
+  </script>
+</body>
+</html>
