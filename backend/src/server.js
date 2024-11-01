@@ -1,9 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const database = require("../src/config/database");
+const nodemailer = require('nodemailer');
+
 
 const UserRouter = require("../src/routes/user");
-const JokeRouter = require("../src/routes/joke");
 const UserApi = require("../src/api/user"); 
 const authMiddleware = require("../src/middleware/auth");
 
@@ -19,7 +20,6 @@ app.post("/api/login", UserApi.login);
 app.post("/api/user", UserApi.createUserViewer); 
 
 app.use("/api/user", authMiddleware(), UserRouter);
-app.use("/api/joke", JokeRouter);
 
 database.db
     .sync({ force: false })
