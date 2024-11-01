@@ -1,4 +1,3 @@
-<!-- codigo-acesso.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Código de Acesso</title>
   <style>
-    /* Estilos aqui */
   </style>
 </head>
 <body>
@@ -18,7 +16,7 @@
   </div>
 
   <script>
-    let tempoRestante = 300; // 5 minutos
+    let tempoRestante = 300; 
     const contador = document.getElementById('contador');
 
     const intervalo = setInterval(() => {
@@ -27,13 +25,13 @@
       if (tempoRestante <= 0) {
         clearInterval(intervalo);
         alert('Código expirado.');
-        window.location.href = '/login.html'; // Redirecionar para a tela de login
+        window.location.href = '/login.html'; 
       }
     }, 1000);
 
     function verificarCodigo() {
       const codigo = document.getElementById('codigo').value;
-      const email = document.getElementById('email'); // Pode ser necessário passar o email de alguma forma
+      const email = document.getElementById('email'); 
 
       fetch('/api/user/verify-access-code', {
         method: 'POST',
@@ -43,7 +41,6 @@
       .then(response => response.json())
       .then(data => {
         alert('Acesso autorizado! Token: ' + data.token);
-        // Redirecionar para a tela de sucesso
         window.location.href = '/sucesso.html';
       })
       .catch(err => alert('Erro: ' + err.message));

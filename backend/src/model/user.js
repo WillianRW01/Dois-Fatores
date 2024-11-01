@@ -1,4 +1,3 @@
-// model/user.js
 const database = require("../config/database");
 
 class User {

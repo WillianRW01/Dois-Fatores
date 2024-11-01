@@ -1,4 +1,3 @@
-<!-- sucesso.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -55,12 +54,11 @@
   </div>
 
   <script>
-    // Aqui você pode armazenar o token em um localStorage ou cookie, conforme necessário
+
     const token = localStorage.getItem('token') || 'Seu token de sessão será exibido aqui.';
     document.getElementById('token').innerText = token;
 
     function logout() {
-      // Limpar o token do localStorage ou cookie e redirecionar para a tela de login
       localStorage.removeItem('token');
       window.location.href = '/login.html';
     }
