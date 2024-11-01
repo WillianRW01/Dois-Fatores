@@ -5,22 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Código de Acesso</title>
   <style>
-    body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: Arial, sans-serif; }
-    .container { width: 300px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-    input, button { width: 100%; padding: 10px; margin-top: 10px; }
-    .timer { color: red; }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Código de Acesso</h2>
-    <p class="timer">Tempo restante: <span id="contador">30</span> segundos</p>
+    <p>Tempo restante: <span id="contador">300</span> segundos</p>
     <input type="text" id="codigo" placeholder="Digite o código">
     <button onclick="verificarCodigo()">Verificar Código</button>
   </div>
 
   <script>
-    let tempoRestante = 30;
+    let tempoRestante = 300; 
     const contador = document.getElementById('contador');
 
     const intervalo = setInterval(() => {
@@ -29,12 +25,25 @@
       if (tempoRestante <= 0) {
         clearInterval(intervalo);
         alert('Código expirado.');
+        window.location.href = '/login.html'; 
       }
     }, 1000);
 
     function verificarCodigo() {
       const codigo = document.getElementById('codigo').value;
-      alert('Verificando código...');
+      const email = document.getElementById('email'); 
+
+      fetch('/api/user/verify-access-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, codigo_acesso: codigo })
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert('Acesso autorizado! Token: ' + data.token);
+        window.location.href = '/sucesso.html';
+      })
+      .catch(err => alert('Erro: ' + err.message));
     }
   </script>
 </body>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autenticação Bem-Sucedida</title>
+  <style>
+    body { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      height: 100vh; 
+      margin: 0; 
+      font-family: Arial, sans-serif; 
+      background-color: #f0f2f5;
+    }
+    .container { 
+      width: 300px; 
+      padding: 20px; 
+      border: 1px solid #ddd; 
+      border-radius: 5px; 
+      background: #fff; 
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    h2 { 
+      color: #4CAF50; 
+    }
+    .token { 
+      font-weight: bold; 
+      color: #007bff; 
+    }
+    button { 
+      margin-top: 20px; 
+      padding: 10px 20px; 
+      background-color: #007bff; 
+      color: white; 
+      border: none; 
+      border-radius: 4px; 
+      cursor: pointer; 
+    }
+    button:hover { 
+      background-color: #0056b3; 
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Sucesso!</h2>
+    <p>Sessão iniciada com sucesso.</p>
+    <p><strong>Token de Sessão:</strong></p>
+    <p class="token" id="token"></p>
+    <button onclick="logout()">Sair</button>
+  </div>
+
+  <script>
+
+    const token = localStorage.getItem('token') || 'Seu token de sessão será exibido aqui.';
+    document.getElementById('token').innerText = token;
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

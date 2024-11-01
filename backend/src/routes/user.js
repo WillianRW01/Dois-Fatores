@@ -4,13 +4,9 @@ const authMiddleware = require('../middleware/auth');
 
 const useRouter = express.Router();
 
-useRouter.post('/login', UserApi.login)
-useRouter.get('/', authMiddleware(['admin', 'viewer']), UserApi.findUser);
-useRouter.post('/admin', authMiddleware(['admin']), UserApi.createUserAdmin);
+useRouter.post('/login', UserApi.login);
+useRouter.post('/verify-access-code', UserApi.verifyAccessCode);
 useRouter.post('/', UserApi.createUserViewer);
-useRouter.put('/:id', authMiddleware(), UserApi.updateUser);
-useRouter.delete('/:id', UserApi.deleteUser);
-useRouter.post('/blockUser/:id', authMiddleware(['admin']), UserApi.blockUser)
-useRouter.post('/unblockUser/:id', authMiddleware(['admin']), UserApi.unblockUser)
+useRouter.get('/:id', UserApi.findUser);
 
 module.exports = useRouter;

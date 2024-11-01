@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
   <style>
-    body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: Arial, sans-serif; }
-    .container { width: 300px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-    input, button { width: 100%; padding: 10px; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -22,8 +19,18 @@
     function login() {
       const email = document.getElementById('email').value;
       const senha = document.getElementById('senha').value;
-      // Simula requisição de autenticação
-      alert('Autenticando...');
+
+      fetch('http://localhost:3000/api/login', {
+    method: 'POST', 
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email: 'wesley18alanarruda@gmail.com', senha: '1234567' })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Erro:', error));
+
     }
   </script>
 </body>
