@@ -1,4 +1,3 @@
-// controller/user.js
 const user = require("../model/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -39,7 +38,7 @@ class UserController {
             throw new Error("Usuário e senha inválidos.");
         }
 
-        // Gerar e enviar o código de acesso
+   
         const codigoAcesso = Math.floor(100000 + Math.random() * 900000).toString();
         userValue.codigo_acesso = codigoAcesso;
         userValue.codigo_acesso_create_at = new Date();
@@ -53,11 +52,11 @@ class UserController {
     async sendAccessCode(email, codigoAcesso) {
       const transporter = nodemailer.createTransport({
         host: 'sandbox.smtp.mailtrap.io',
-        port: 587, // ou 587
-        secure: false, // true para 465, false para 587
+        port: 587,
+        secure: false, 
         auth: {
             user: 'c25858f0b40195',
-            pass: 'e9c117e1bb1fa4' // considere usar variáveis de ambiente
+            pass: 'e9c117e1bb1fa4' 
         }
     });
 
@@ -81,10 +80,9 @@ class UserController {
         const userValue = await user.findOne({ where: { email } });
         const now = new Date();
 
-        // Verifica se o código é válido e se não expirou
         if (userValue && userValue.codigo_acesso === codigoAcesso) {
             const expirationTime = new Date(userValue.codigo_acesso_create_at);
-            expirationTime.setMinutes(expirationTime.getMinutes() + 5); // código expira em 5 minutos
+            expirationTime.setMinutes(expirationTime.getMinutes() + 5);
 
             if (now <= expirationTime) {
                 return jwt.sign({ id: userValue.id, permissao: userValue.permissao }, SECRET_KEY, { expiresIn: 60 * 60 });
