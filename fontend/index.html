@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autenticação</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f2f5;
+    }
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    h2 {
+      color: #333;
+    }
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 1rem 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .error {
+      color: #d9534f;
+      margin-top: 1rem;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="cadastro">
+    <h2>Cadastro</h2>
+    <input type="text" id="nome" placeholder="Nome" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="senha" placeholder="Senha" required>
+    <button onclick="cadastrar()">Cadastrar</button>
+    <p class="error" id="cadastroError" style="display: none;"></p>
+  </div>
+
+  <div class="container hidden" id="codigoAcesso">
+    <h2>Código de Acesso</h2>
+    <p>Tempo restante: <span id="contador">300</span> segundos</p>
+    <input type="text" id="codigo" placeholder="Digite o código">
+    <button onclick="verificarCodigo()">Verificar Código</button>
+    <p class="error" id="codigoError" style="display: none;"></p>
+  </div>
+
+  <div class="container hidden" id="sucesso">
+    <h2>Sucesso!</h2>
+    <p>Sessão iniciada com sucesso.</p>
+    <p><strong>Token de Sessão:</strong> <span id="token"></span></p>
+    <button onclick="logout()">Sair</button>
+  </div>
+
+  <div class="container hidden" id="login">
+    <h2>Login</h2>
+    <input type="email" id="loginEmail" placeholder="Email">
+    <input type="password" id="loginSenha" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+  </div>
+
+  <script>
+    function toggleSection(sectionId) {
+      document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
+      document.getElementById(sectionId).classList.remove('hidden');
+    }
+
+    async function cadastrar() {
+      const nome = document.getElementById('nome').value;
+      const email = document.getElementById('email').value;
+      const senha = document.getElementById('senha').value;
+      const errorElement = document.getElementById('cadastroError');
+      errorElement.style.display = 'none';
+
+      try {
+        const response = await fetch('http://localhost:3000/api/user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, email, senha })
+        });
+        if (!response.ok) throw new Error('Erro ao cadastrar.');
+        alert('Cadastro realizado com sucesso!');
+        iniciarContador(); // Iniciar o contador ao acessar a tela de código de acesso
+        toggleSection('codigoAcesso');
+      } catch (error) {
+        errorElement.innerText = error.message;
+        errorElement.style.display = 'block';
+      }
+    }
+
+    function iniciarContador() {
+      let tempo = 300; // 300 segundos (5 minutos)
+      const contador = document.getElementById('contador');
+      const interval = setInterval(() => {
+        if (tempo <= 0) {
+          clearInterval(interval);
+          alert('Tempo expirado. Faça o login novamente.');
+          toggleSection('login');
+        } else {
+          tempo--;
+          contador.textContent = tempo;
+        }
+      }, 1000);
+    }
+
+    async function verificarCodigo() {
+      const codigo = document.getElementById('codigo').value;
+      const errorElement = document.getElementById('codigoError');
+      errorElement.style.display = 'none';
+
+      try {
+        const response = await fetch('http://localhost:3000/api/verificar-codigo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) throw new Error(data.message || 'Código incorreto.');
+        alert('Acesso autorizado!');
+        localStorage.setItem('token', data.token);
+        toggleSection('sucesso');
+      } catch (error) {
+        errorElement.innerText = error.message;
+        errorElement.style.display = 'block';
+      }
+    }
+
+    function login() {
+      const email = document.getElementById('loginEmail').value;
+      const senha = document.getElementById('loginSenha').value;
+
+      fetch('http://localhost:3000/api/login', {
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      })
+      .then(response => response.json())
+      .then(data => {
+        localStorage.setItem('token', data.token);
+        toggleSection('sucesso');
+      })
+      .catch(error => console.error('Erro:', error));
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      toggleSection('login');
+    }
+  </script>
+</body>
+</html>
