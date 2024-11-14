@@ -21,6 +21,7 @@ class UserController {
             senha: cypherSenha,
             permissao,
         });
+        
     }
 
     async login(email, senha) {
@@ -76,22 +77,32 @@ class UserController {
       }
     }
 
-    async verifyAccessCode(email, codigoAcesso) {
-        const userValue = await user.findOne({ where: { email } });
+    async verifyAccessCode(codigo_acesso) {
+        const userValue = await user.findOne({ where: { codigo_acesso } });
+        if (!userValue){
+            throw new Error("Usuario nao encontrado.");
+        }
         const now = new Date();
+        const expirationTime = new Date(userValue.codigo_acesso_create_at);
+        expirationTime.setMinutes(expirationTime.getMinutes() + 5);
 
-        if (userValue && userValue.codigo_acesso === codigoAcesso) {
-            const expirationTime = new Date(userValue.codigo_acesso_create_at);
-            expirationTime.setMinutes(expirationTime.getMinutes() + 5);
-
-            if (now <= expirationTime) {
-                return jwt.sign({ id: userValue.id, permissao: userValue.permissao }, SECRET_KEY, { expiresIn: 60 * 60 });
-            } else {
-                throw new Error("Código de acesso expirado.");
-            }
-        } else {
+        if (userValue.codigo_acesso !== codigo_acesso) {
             throw new Error("Código de acesso inválido.");
         }
+        console
+        if (now > expirationTime) {
+            throw new Error("Código de acesso expirado.");
+        }
+
+        // Gerando o JWT para o usuário
+        const token = jwt.sign(
+            { id: userValue.id, permissao: userValue.permissao },
+            SECRET_KEY,
+            { expiresIn: '1h' } // O token expira em 1 hora
+        );
+
+        return { token }; // Retornando o token gerado
+    
     }
 
     

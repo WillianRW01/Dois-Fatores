@@ -18,6 +18,8 @@ app.get("/", (req, res) => {
 
 app.post("/api/login", UserApi.login);
 app.post("/api/user", UserApi.createUserViewer); 
+app.post('/api/verify-access-code', UserApi.verifyAccessCode);
+app.get('/:id', UserApi.findUser);
 
 app.use("/api/user", authMiddleware(), UserRouter);
 

@@ -1,5 +1,6 @@
 const UserController = require('../controller/user');
 const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
 
 
 
@@ -10,7 +11,14 @@ class UserApi {
 
         try {
             const user = await UserController.createUser(nome, email, senha, "viewer");
-            return res.status(201).send(user);
+
+            const token = jwt.sign(
+                { id: user.id, permissao: user.permissao },
+                process.env.SECRET_KEY || 'exemplo',
+                { expiresIn: '1h' }
+            );
+
+            return res.status(201).send({ message: "Usuário criado com sucesso!", token });
         } catch (e) {
             console.log(e)
             return res.status(400).send({ error: `Erro ao criar usuário: ${e.message}` });
@@ -38,14 +46,25 @@ class UserApi {
     }
 
     async verifyAccessCode(req, res) {
-        const { email, codigo_acesso } = req.body;
+        const {codigo_acesso } = req.body;
 
         try {
-            const token = await UserController.verifyAccessCode(email, codigo_acesso);
-            return res.status(200).send({ token });
+            const result = await UserController.verifyAccessCode(codigo_acesso);
+            console.log (result);
+            if (result.token) {
+                return res.status(200).json({success: true, token: result.token });
+            } else {
+                return res.status(400).json({ error: 'Codigo de acesso invalido' });
+            }
         } catch (e) {
-            return res.status(400).send({ error: e.message });
+            console.error(e);
+            return res.status(400).json({ error: e.message });
         }
+    }
+
+    async batata(req, res) {
+        return res.status(400).json({ mensagem: 'batata' });
+            
     }
 }
 

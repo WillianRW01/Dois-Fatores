@@ -59,6 +59,7 @@
   </style>
 </head>
 <body>
+  <!-- Tela de Cadastro -->
   <div class="container" id="cadastro">
     <h2>Cadastro</h2>
     <input type="text" id="nome" placeholder="Nome" required>
@@ -67,7 +68,17 @@
     <button onclick="cadastrar()">Cadastrar</button>
     <p class="error" id="cadastroError" style="display: none;"></p>
   </div>
-
+ 
+  <!-- Tela de Login -->
+  <div class="container hidden" id="login">
+    <h2>Login</h2>
+    <input type="email" id="loginEmail" placeholder="Email">
+    <input type="password" id="loginSenha" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+    <p class="error" id="loginError" style="display: none;"></p>
+  </div>
+ 
+  <!-- Tela de Código de Acesso -->
   <div class="container hidden" id="codigoAcesso">
     <h2>Código de Acesso</h2>
     <p>Tempo restante: <span id="contador">300</span> segundos</p>
@@ -75,7 +86,8 @@
     <button onclick="verificarCodigo()">Verificar Código</button>
     <p class="error" id="codigoError" style="display: none;"></p>
   </div>
-
+ 
+  <!-- Tela de Sucesso -->
   <div class="container hidden" id="sucesso">
     <h2>Sucesso!</h2>
     <p>Sessão iniciada com sucesso.</p>
@@ -83,19 +95,14 @@
     <button onclick="logout()">Sair</button>
   </div>
 
-  <div class="container hidden" id="login">
-    <h2>Login</h2>
-    <input type="email" id="loginEmail" placeholder="Email">
-    <input type="password" id="loginSenha" placeholder="Senha">
-    <button onclick="login()">Entrar</button>
-  </div>
-
   <script>
+    // Função para alternar entre as seções
     function toggleSection(sectionId) {
       document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
       document.getElementById(sectionId).classList.remove('hidden');
     }
 
+    // Função de cadastro
     async function cadastrar() {
       const nome = document.getElementById('nome').value;
       const email = document.getElementById('email').value;
@@ -111,14 +118,15 @@
         });
         if (!response.ok) throw new Error('Erro ao cadastrar.');
         alert('Cadastro realizado com sucesso!');
-        iniciarContador(); // Iniciar o contador ao acessar a tela de código de acesso
-        toggleSection('codigoAcesso');
+        // Vai para a tela de login após o cadastro
+        toggleSection('login');
       } catch (error) {
         errorElement.innerText = error.message;
         errorElement.style.display = 'block';
       }
     }
 
+    // Função para iniciar o contador de tempo
     function iniciarContador() {
       let tempo = 300; // 300 segundos (5 minutos)
       const contador = document.getElementById('contador');
@@ -134,16 +142,17 @@
       }, 1000);
     }
 
+    // Função para verificar o código de acesso
     async function verificarCodigo() {
       const codigo = document.getElementById('codigo').value;
       const errorElement = document.getElementById('codigoError');
       errorElement.style.display = 'none';
 
       try {
-        const response = await fetch('http://localhost:3000/api/verificar-codigo', {
+        const response = await fetch('http://localhost:3000/api/verify-access-code', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ codigo })
+          body: JSON.stringify({ codigo_acesso:codigo })
         });
         const data = await response.json();
         if (!response.ok || !data.success) throw new Error(data.message || 'Código incorreto.');
@@ -156,23 +165,34 @@
       }
     }
 
+    // Função de login
     function login() {
       const email = document.getElementById('loginEmail').value;
       const senha = document.getElementById('loginSenha').value;
+      const errorElement = document.getElementById('loginError');
+      errorElement.style.display = 'none';
 
       fetch('http://localhost:3000/api/login', {
-        method: 'POST', 
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha })
       })
       .then(response => response.json())
       .then(data => {
+        if (!data.token) {
+          throw new Error('Login falhou!');
+        }
         localStorage.setItem('token', data.token);
-        toggleSection('sucesso');
+        iniciarContador();  // Iniciar contador após login
+        toggleSection('codigoAcesso');  // Vai para o código de acesso
       })
-      .catch(error => console.error('Erro:', error));
+      .catch(error => {
+        errorElement.innerText = error.message;
+        errorElement.style.display = 'block';
+      });
     }
 
+    // Função de logout
     function logout() {
       localStorage.removeItem('token');
       toggleSection('login');
@@ -180,3 +200,4 @@
   </script>
 </body>
 </html>
+
